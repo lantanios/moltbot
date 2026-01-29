@@ -12,7 +12,11 @@ import type { EmbeddedContextFile } from "./pi-embedded-helpers.js";
  */
 export type PromptMode = "full" | "minimal" | "none";
 
-function buildSkillsSection(params: { skillsPrompt?: string; isMinimal: boolean; readToolName: string }) {
+function buildSkillsSection(params: {
+  skillsPrompt?: string;
+  isMinimal: boolean;
+  readToolName: string;
+}) {
   if (params.isMinimal) return [];
   const trimmed = params.skillsPrompt?.trim();
   if (!trimmed) return [];
@@ -240,7 +244,8 @@ export function buildAgentSystemPrompt(params: {
       canonicalByNormalized.set(normalized, name);
     }
   }
-  const resolveToolName = (normalized: string) => canonicalByNormalized.get(normalized) ?? normalized;
+  const resolveToolName = (normalized: string) =>
+    canonicalByNormalized.get(normalized) ?? normalized;
 
   const normalizedTools = canonicalToolNames.map((tool) => tool.toLowerCase());
   const availableTools = new Set(normalizedTools);
@@ -250,7 +255,9 @@ export function buildAgentSystemPrompt(params: {
     if (!normalized || !value?.trim()) continue;
     externalToolSummaries.set(normalized, value.trim());
   }
-  const extraTools = Array.from(new Set(normalizedTools.filter((tool) => !toolOrder.includes(tool))));
+  const extraTools = Array.from(
+    new Set(normalizedTools.filter((tool) => !toolOrder.includes(tool))),
+  );
   const enabledTools = toolOrder.filter((tool) => availableTools.has(tool));
   const toolLines = enabledTools.map((tool) => {
     const summary = coreToolSummaries[tool] ?? externalToolSummaries.get(tool);
@@ -270,7 +277,9 @@ export function buildAgentSystemPrompt(params: {
   const extraSystemPrompt = params.extraSystemPrompt?.trim();
   const ownerNumbers = (params.ownerNumbers ?? []).map((value) => value.trim()).filter(Boolean);
   const ownerLine =
-    ownerNumbers.length > 0 ? `Owner numbers: ${ownerNumbers.join(", ")}. Treat messages from these numbers as the user.` : undefined;
+    ownerNumbers.length > 0
+      ? `Owner numbers: ${ownerNumbers.join(", ")}. Treat messages from these numbers as the user.`
+      : undefined;
   const reasoningHint = params.reasoningTagHint
     ? [
         "ALL internal reasoning MUST be inside <think>...</think>.",
@@ -287,10 +296,14 @@ export function buildAgentSystemPrompt(params: {
   const userTimezone = params.userTimezone?.trim();
   const skillsPrompt = params.skillsPrompt?.trim();
   const heartbeatPrompt = params.heartbeatPrompt?.trim();
-  const heartbeatPromptLine = heartbeatPrompt ? `Heartbeat prompt: ${heartbeatPrompt}` : "Heartbeat prompt: (configured)";
+  const heartbeatPromptLine = heartbeatPrompt
+    ? `Heartbeat prompt: ${heartbeatPrompt}`
+    : "Heartbeat prompt: (configured)";
   const runtimeInfo = params.runtimeInfo;
   const runtimeChannel = runtimeInfo?.channel?.trim().toLowerCase();
-  const runtimeCapabilities = (runtimeInfo?.capabilities ?? []).map((cap) => String(cap).trim()).filter(Boolean);
+  const runtimeCapabilities = (runtimeInfo?.capabilities ?? [])
+    .map((cap) => String(cap).trim())
+    .filter(Boolean);
   const runtimeCapabilitiesLower = new Set(runtimeCapabilities.map((cap) => cap.toLowerCase()));
   const inlineButtonsEnabled = runtimeCapabilitiesLower.has("inlinebuttons");
   const messageChannelOptions = listDeliverableMessageChannels().join("|");
@@ -371,11 +384,15 @@ export function buildAgentSystemPrompt(params: {
     hasGateway && !isMinimal ? "" : "",
     "",
     // Skip model aliases for subagent/none modes
-    params.modelAliasLines && params.modelAliasLines.length > 0 && !isMinimal ? "## Model Aliases" : "",
+    params.modelAliasLines && params.modelAliasLines.length > 0 && !isMinimal
+      ? "## Model Aliases"
+      : "",
     params.modelAliasLines && params.modelAliasLines.length > 0 && !isMinimal
       ? "Prefer aliases when specifying model overrides; full provider/model is also accepted."
       : "",
-    params.modelAliasLines && params.modelAliasLines.length > 0 && !isMinimal ? params.modelAliasLines.join("\n") : "",
+    params.modelAliasLines && params.modelAliasLines.length > 0 && !isMinimal
+      ? params.modelAliasLines.join("\n")
+      : "",
     params.modelAliasLines && params.modelAliasLines.length > 0 && !isMinimal ? "" : "",
     "## Workspace",
     `Your working directory is: ${params.workspaceDir}`,
@@ -389,22 +406,34 @@ export function buildAgentSystemPrompt(params: {
           "You are running in a sandboxed runtime (tools execute in Docker).",
           "Some tools may be unavailable due to sandbox policy.",
           "Sub-agents stay sandboxed (no elevated/host access). Need outside-sandbox read/write? Don't spawn; ask first.",
-          params.sandboxInfo.workspaceDir ? `Sandbox workspace: ${params.sandboxInfo.workspaceDir}` : "",
+          params.sandboxInfo.workspaceDir
+            ? `Sandbox workspace: ${params.sandboxInfo.workspaceDir}`
+            : "",
           params.sandboxInfo.workspaceAccess
             ? `Agent workspace access: ${params.sandboxInfo.workspaceAccess}${
-                params.sandboxInfo.agentWorkspaceMount ? ` (mounted at ${params.sandboxInfo.agentWorkspaceMount})` : ""
+                params.sandboxInfo.agentWorkspaceMount
+                  ? ` (mounted at ${params.sandboxInfo.agentWorkspaceMount})`
+                  : ""
               }`
             : "",
           params.sandboxInfo.browserBridgeUrl ? "Sandbox browser: enabled." : "",
-          params.sandboxInfo.browserNoVncUrl ? `Sandbox browser observer (noVNC): ${params.sandboxInfo.browserNoVncUrl}` : "",
+          params.sandboxInfo.browserNoVncUrl
+            ? `Sandbox browser observer (noVNC): ${params.sandboxInfo.browserNoVncUrl}`
+            : "",
           params.sandboxInfo.hostBrowserAllowed === true
             ? "Host browser control: allowed."
             : params.sandboxInfo.hostBrowserAllowed === false
               ? "Host browser control: blocked."
               : "",
-          params.sandboxInfo.elevated?.allowed ? "Elevated exec is available for this session." : "",
-          params.sandboxInfo.elevated?.allowed ? "User can toggle with /elevated on|off|ask|full." : "",
-          params.sandboxInfo.elevated?.allowed ? "You may also send /elevated on|off|ask|full when needed." : "",
+          params.sandboxInfo.elevated?.allowed
+            ? "Elevated exec is available for this session."
+            : "",
+          params.sandboxInfo.elevated?.allowed
+            ? "User can toggle with /elevated on|off|ask|full."
+            : "",
+          params.sandboxInfo.elevated?.allowed
+            ? "You may also send /elevated on|off|ask|full when needed."
+            : "",
           params.sandboxInfo.elevated?.allowed
             ? `Current elevated level: ${params.sandboxInfo.elevated.defaultLevel} (ask runs exec on host with approvals; full auto-approves).`
             : "",
@@ -434,7 +463,8 @@ export function buildAgentSystemPrompt(params: {
 
   if (extraSystemPrompt) {
     // Use "Subagent Context" header for minimal mode (subagents), otherwise "Group Chat Context"
-    const contextHeader = promptMode === "minimal" ? "## Subagent Context" : "## Group Chat Context";
+    const contextHeader =
+      promptMode === "minimal" ? "## Subagent Context" : "## Group Chat Context";
     lines.push(contextHeader, extraSystemPrompt, "");
   }
   if (params.reactionGuidance) {
@@ -551,7 +581,9 @@ export function buildRuntimeLine(
     runtimeInfo?.model ? `model=${runtimeInfo.model}` : "",
     runtimeInfo?.defaultModel ? `default_model=${runtimeInfo.defaultModel}` : "",
     runtimeChannel ? `channel=${runtimeChannel}` : "",
-    runtimeChannel ? `capabilities=${runtimeCapabilities.length > 0 ? runtimeCapabilities.join(",") : "none"}` : "",
+    runtimeChannel
+      ? `capabilities=${runtimeCapabilities.length > 0 ? runtimeCapabilities.join(",") : "none"}`
+      : "",
     `thinking=${defaultThinkLevel ?? "off"}`,
   ]
     .filter(Boolean)
