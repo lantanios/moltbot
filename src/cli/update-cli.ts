@@ -6,7 +6,12 @@ import type { Command } from "commander";
 
 import { readConfigFileSnapshot, writeConfigFile } from "../config/config.js";
 import { resolveMoltbotPackageRoot } from "../infra/moltbot-root.js";
-import { checkUpdateStatus, compareSemverStrings, fetchNpmTagVersion, resolveNpmChannelTag } from "../infra/update-check.js";
+import {
+  checkUpdateStatus,
+  compareSemverStrings,
+  fetchNpmTagVersion,
+  resolveNpmChannelTag,
+} from "../infra/update-check.js";
 import { parseSemver } from "../infra/runtime-guard.js";
 import {
   runGatewayUpdate,
@@ -39,7 +44,11 @@ import { stylePromptHint, stylePromptMessage } from "../terminal/prompt-style.js
 import { theme } from "../terminal/theme.js";
 import { renderTable } from "../terminal/table.js";
 import { formatHelpExamples } from "./help-format.js";
-import { formatUpdateAvailableHint, formatUpdateOneLiner, resolveUpdateAvailability } from "../commands/status.update.js";
+import {
+  formatUpdateAvailableHint,
+  formatUpdateOneLiner,
+  resolveUpdateAvailability,
+} from "../commands/status.update.js";
 import { syncPluginsForUpdateChannel, updateNpmInstalledPlugins } from "../plugins/update.js";
 import { runCommandWithTimeout } from "../process/exec.js";
 
@@ -291,18 +300,30 @@ async function resolveGlobalManager(params: {
     return { stdout: res.stdout, stderr: res.stderr, code: res.code };
   };
   if (params.installKind === "package") {
-    const detected = await detectGlobalInstallManagerForRoot(runCommand, params.root, params.timeoutMs);
+    const detected = await detectGlobalInstallManagerForRoot(
+      runCommand,
+      params.root,
+      params.timeoutMs,
+    );
     if (detected) return detected;
   }
   const byPresence = await detectGlobalInstallManagerByPresence(runCommand, params.timeoutMs);
   return byPresence ?? "npm";
 }
 
-function formatGitStatusLine(params: { branch: string | null; tag: string | null; sha: string | null }): string {
+function formatGitStatusLine(params: {
+  branch: string | null;
+  tag: string | null;
+  sha: string | null;
+}): string {
   const shortSha = params.sha ? params.sha.slice(0, 8) : null;
   const branch = params.branch && params.branch !== "HEAD" ? params.branch : null;
   const tag = params.tag;
-  const parts = [branch ?? (tag ? "detached" : "git"), tag ? `tag ${tag}` : null, shortSha ? `@ ${shortSha}` : null].filter(Boolean);
+  const parts = [
+    branch ?? (tag ? "detached" : "git"),
+    tag ? `tag ${tag}` : null,
+    shortSha ? `@ ${shortSha}` : null,
+  ].filter(Boolean);
   return parts.join(" · ");
 }
 
@@ -321,7 +342,9 @@ export async function updateStatusCommand(opts: UpdateStatusOptions): Promise<vo
       cwd: process.cwd(),
     })) ?? process.cwd();
   const configSnapshot = await readConfigFileSnapshot();
-  const configChannel = configSnapshot.valid ? normalizeUpdateChannel(configSnapshot.config.update?.channel) : null;
+  const configChannel = configSnapshot.valid
+    ? normalizeUpdateChannel(configSnapshot.config.update?.channel)
+    : null;
 
   const update = await checkUpdateStatus({
     root,
@@ -479,7 +502,9 @@ const selectStyled = <T>(params: Parameters<typeof select<T>>[0]) =>
   select({
     ...params,
     message: stylePromptMessage(params.message),
-    options: params.options.map((opt) => (opt.hint === undefined ? opt : { ...opt, hint: stylePromptHint(opt.hint) })),
+    options: params.options.map((opt) =>
+      opt.hint === undefined ? opt : { ...opt, hint: stylePromptHint(opt.hint) },
+    ),
   });
 
 type PrintResultOptions = UpdateCommandOptions & {
@@ -492,10 +517,13 @@ function printResult(result: UpdateRunResult, opts: PrintResultOptions) {
     return;
   }
 
-  const statusColor = result.status === "ok" ? theme.success : result.status === "skipped" ? theme.warn : theme.error;
+  const statusColor =
+    result.status === "ok" ? theme.success : result.status === "skipped" ? theme.warn : theme.error;
 
   defaultRuntime.log("");
-  defaultRuntime.log(`${theme.heading("Update Result:")} ${statusColor(result.status.toUpperCase())}`);
+  defaultRuntime.log(
+    `${theme.heading("Update Result:")} ${statusColor(result.status.toUpperCase())}`,
+  );
   if (result.root) {
     defaultRuntime.log(`  Root: ${theme.muted(result.root)}`);
   }
@@ -563,7 +591,9 @@ export async function updateCommand(opts: UpdateCommandOptions): Promise<void> {
 
   const configSnapshot = await readConfigFileSnapshot();
   let activeConfig = configSnapshot.valid ? configSnapshot.config : null;
-  const storedChannel = configSnapshot.valid ? normalizeUpdateChannel(configSnapshot.config.update?.channel) : null;
+  const storedChannel = configSnapshot.valid
+    ? normalizeUpdateChannel(configSnapshot.config.update?.channel)
+    : null;
 
   const requestedChannel = normalizeUpdateChannel(opts.channel);
   if (opts.channel && !requestedChannel) {
@@ -580,9 +610,11 @@ export async function updateCommand(opts: UpdateCommandOptions): Promise<void> {
 
   const installKind = updateStatus.installKind;
   const switchToGit = requestedChannel === "dev" && installKind !== "git";
-  const switchToPackage = requestedChannel !== null && requestedChannel !== "dev" && installKind === "git";
+  const switchToPackage =
+    requestedChannel !== null && requestedChannel !== "dev" && installKind === "git";
   const updateInstallKind = switchToGit ? "git" : switchToPackage ? "package" : installKind;
-  const defaultChannel = updateInstallKind === "git" ? DEFAULT_GIT_CHANNEL : DEFAULT_PACKAGE_CHANNEL;
+  const defaultChannel =
+    updateInstallKind === "git" ? DEFAULT_GIT_CHANNEL : DEFAULT_PACKAGE_CHANNEL;
   const channel = requestedChannel ?? storedChannel ?? defaultChannel;
   const explicitTag = normalizeTag(opts.tag);
   let tag = explicitTag ?? channelToNpmTag(channel);
@@ -596,13 +628,20 @@ export async function updateCommand(opts: UpdateCommandOptions): Promise<void> {
           fallbackToLatest = channel === "beta" && resolved.tag === "latest";
           return resolved.version;
         });
-    const cmp = currentVersion && targetVersion ? compareSemverStrings(currentVersion, targetVersion) : null;
-    const needsConfirm = !fallbackToLatest && currentVersion != null && (targetVersion == null || (cmp != null && cmp > 0));
+    const cmp =
+      currentVersion && targetVersion ? compareSemverStrings(currentVersion, targetVersion) : null;
+    const needsConfirm =
+      !fallbackToLatest &&
+      currentVersion != null &&
+      (targetVersion == null || (cmp != null && cmp > 0));
 
     if (needsConfirm && !opts.yes) {
       if (!process.stdin.isTTY || opts.json) {
         defaultRuntime.error(
-          ["Downgrade confirmation required.", "Downgrading can break configuration. Re-run in a TTY to confirm."].join("\n"),
+          [
+            "Downgrade confirmation required.",
+            "Downgrading can break configuration. Re-run in a TTY to confirm.",
+          ].join("\n"),
         );
         defaultRuntime.exit(1);
         return;
@@ -623,7 +662,9 @@ export async function updateCommand(opts: UpdateCommandOptions): Promise<void> {
       }
     }
   } else if (opts.tag && !opts.json) {
-    defaultRuntime.log(theme.muted("Note: --tag applies to npm installs only; git updates ignore it."));
+    defaultRuntime.log(
+      theme.muted("Note: --tag applies to npm installs only; git updates ignore it."),
+    );
   }
 
   if (requestedChannel && configSnapshot.valid) {
@@ -664,7 +705,9 @@ export async function updateCommand(opts: UpdateCommandOptions): Promise<void> {
       return { stdout: res.stdout, stderr: res.stderr, code: res.code };
     };
     const pkgRoot = await resolveGlobalPackageRoot(manager, runCommand, timeoutMs ?? 20 * 60_000);
-    const packageName = (pkgRoot ? await readPackageName(pkgRoot) : await readPackageName(root)) ?? DEFAULT_PACKAGE_NAME;
+    const packageName =
+      (pkgRoot ? await readPackageName(pkgRoot) : await readPackageName(root)) ??
+      DEFAULT_PACKAGE_NAME;
     const beforeVersion = pkgRoot ? await readPackageVersion(pkgRoot) : null;
     const updateStep = await runUpdateStep({
       name: "global update",
@@ -771,7 +814,11 @@ export async function updateCommand(opts: UpdateCommandOptions): Promise<void> {
 
   if (result.status === "skipped") {
     if (result.reason === "dirty") {
-      defaultRuntime.log(theme.warn("Skipped: working directory has uncommitted changes. Commit or stash them first."));
+      defaultRuntime.log(
+        theme.warn(
+          "Skipped: working directory has uncommitted changes. Commit or stash them first.",
+        ),
+      );
     }
     if (result.reason === "not-git-install") {
       defaultRuntime.log(
@@ -829,10 +876,16 @@ export async function updateCommand(opts: UpdateCommandOptions): Promise<void> {
       };
 
       if (syncResult.summary.switchedToBundled.length > 0) {
-        defaultRuntime.log(theme.muted(`Switched to bundled plugins: ${summarizeList(syncResult.summary.switchedToBundled)}.`));
+        defaultRuntime.log(
+          theme.muted(
+            `Switched to bundled plugins: ${summarizeList(syncResult.summary.switchedToBundled)}.`,
+          ),
+        );
       }
       if (syncResult.summary.switchedToNpm.length > 0) {
-        defaultRuntime.log(theme.muted(`Restored npm plugins: ${summarizeList(syncResult.summary.switchedToNpm)}.`));
+        defaultRuntime.log(
+          theme.muted(`Restored npm plugins: ${summarizeList(syncResult.summary.switchedToNpm)}.`),
+        );
       }
       for (const warning of syncResult.summary.warnings) {
         defaultRuntime.log(theme.warn(warning));
@@ -921,7 +974,9 @@ export async function updateCommand(opts: UpdateCommandOptions): Promise<void> {
 
 export async function updateWizardCommand(opts: UpdateWizardOptions = {}): Promise<void> {
   if (!process.stdin.isTTY) {
-    defaultRuntime.error("Update wizard requires a TTY. Use `moltbot update --channel <stable|beta|dev>` instead.");
+    defaultRuntime.error(
+      "Update wizard requires a TTY. Use `moltbot update --channel <stable|beta|dev>` instead.",
+    );
     defaultRuntime.exit(1);
     return;
   }
@@ -950,11 +1005,15 @@ export async function updateWizardCommand(opts: UpdateWizardOptions = {}): Promi
     readConfigFileSnapshot(),
   ]);
 
-  const configChannel = configSnapshot.valid ? normalizeUpdateChannel(configSnapshot.config.update?.channel) : null;
+  const configChannel = configSnapshot.valid
+    ? normalizeUpdateChannel(configSnapshot.config.update?.channel)
+    : null;
   const channelInfo = resolveEffectiveUpdateChannel({
     configChannel,
     installKind: updateStatus.installKind,
-    git: updateStatus.git ? { tag: updateStatus.git.tag, branch: updateStatus.git.branch } : undefined,
+    git: updateStatus.git
+      ? { tag: updateStatus.git.tag, branch: updateStatus.git.branch }
+      : undefined,
   });
   const channelLabel = formatUpdateChannelLabel({
     channel: channelInfo.channel,
@@ -1014,7 +1073,9 @@ export async function updateWizardCommand(opts: UpdateWizardOptions = {}): Promi
         }
       }
       const ok = await confirm({
-        message: stylePromptMessage(`Create a git checkout at ${gitDir}? (override via CLAWDBOT_GIT_DIR)`),
+        message: stylePromptMessage(
+          `Create a git checkout at ${gitDir}? (override via CLAWDBOT_GIT_DIR)`,
+        ),
         initialValue: true,
       });
       if (isCancel(ok) || ok === false) {
@@ -1069,7 +1130,9 @@ export function registerUpdateCli(program: Command) {
         ["moltbot update wizard", "Interactive update wizard"],
         ["moltbot --update", "Shorthand for moltbot update"],
       ] as const;
-      const fmtExamples = examples.map(([cmd, desc]) => `  ${theme.command(cmd)} ${theme.muted(`# ${desc}`)}`).join("\n");
+      const fmtExamples = examples
+        .map(([cmd, desc]) => `  ${theme.command(cmd)} ${theme.muted(`# ${desc}`)}`)
+        .join("\n");
       return `
 ${theme.heading("What this does:")}
   - Git checkouts: fetches, rebases, installs deps, builds, and runs doctor
@@ -1115,7 +1178,10 @@ ${theme.muted("Docs:")} ${formatDocsLink("/cli/update", "docs.molt.bot/cli/updat
     .command("wizard")
     .description("Interactive update wizard")
     .option("--timeout <seconds>", "Timeout for each update step in seconds (default: 1200)")
-    .addHelpText("after", `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/update", "docs.molt.bot/cli/update")}\n`)
+    .addHelpText(
+      "after",
+      `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/update", "docs.molt.bot/cli/update")}\n`,
+    )
     .action(async (opts) => {
       try {
         await updateWizardCommand({ timeout: opts.timeout as string | undefined });

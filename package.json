@@ -1,5 +1,13 @@
 {
-  "name": "moltbot",
+  "name": "@ltns-moltbot/moltbot",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lantanios/moltbot.git"
+  },
   "version": "2026.1.29",
   "description": "WhatsApp gateway CLI (Baileys web) with Pi RPC agent",
   "type": "module",
@@ -285,3 +293,5 @@
     ]
   }
 }
+
+

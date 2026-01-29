@@ -2,7 +2,12 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-import { DEFAULT_AGENTS_FILENAME, DEFAULT_IDENTITY_FILENAME, DEFAULT_SOUL_FILENAME, DEFAULT_USER_FILENAME } from "../agents/workspace.js";
+import {
+  DEFAULT_AGENTS_FILENAME,
+  DEFAULT_IDENTITY_FILENAME,
+  DEFAULT_SOUL_FILENAME,
+  DEFAULT_USER_FILENAME,
+} from "../agents/workspace.js";
 import { shortenHomePath } from "../utils.js";
 
 export const MEMORY_SYSTEM_PROMPT = [
@@ -43,7 +48,12 @@ export type LegacyWorkspaceDetection = {
 };
 
 function looksLikeWorkspaceDir(dir: string, exists: (value: string) => boolean) {
-  const markers = [DEFAULT_AGENTS_FILENAME, DEFAULT_SOUL_FILENAME, DEFAULT_USER_FILENAME, DEFAULT_IDENTITY_FILENAME];
+  const markers = [
+    DEFAULT_AGENTS_FILENAME,
+    DEFAULT_SOUL_FILENAME,
+    DEFAULT_USER_FILENAME,
+    DEFAULT_IDENTITY_FILENAME,
+  ];
   return markers.some((name) => exists(path.join(dir, name)));
 }
 
