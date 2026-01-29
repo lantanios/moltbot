@@ -1,5 +1,5 @@
 {
-  "name": "@ltns-moltbot/moltbot",
+  "name": "ltns-moltbot",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
@@ -293,5 +293,6 @@
     ]
   }
 }
+
 
 
