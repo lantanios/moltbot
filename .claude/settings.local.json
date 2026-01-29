@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -Command \"scoop --version\")",
+      "Bash(powershell:*)",
+      "Bash(wsl -d Ubuntu -- useradd:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}
