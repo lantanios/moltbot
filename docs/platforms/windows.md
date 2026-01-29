@@ -4,6 +4,7 @@ read_when:
   - Installing Moltbot on Windows
   - Looking for Windows companion app status
 ---
+
 # Windows (WSL2)
 
 Moltbot on Windows is recommended **via WSL2** (Ubuntu recommended). The
@@ -14,11 +15,13 @@ Windows installs are untested and more problematic.
 Native Windows companion apps are planned.
 
 ## Install (WSL2)
+
 - [Getting Started](/start/getting-started) (use inside WSL)
 - [Install & updates](/install/updating)
 - Official WSL2 guide (Microsoft): https://learn.microsoft.com/windows/wsl/install
 
 ## Gateway
+
 - [Gateway runbook](/gateway)
 - [Configuration](/gateway/configuration)
 
@@ -87,6 +90,7 @@ netsh interface portproxy add v4tov4 listenport=$ListenPort listenaddress=0.0.0.
 ```
 
 Notes:
+
 - SSH from another machine targets the **Windows host IP** (example: `ssh user@windows-host -p 2222`).
 - Remote nodes must point at a **reachable** Gateway URL (not `127.0.0.1`); use
   `moltbot status --all` to confirm.
@@ -137,7 +141,7 @@ systemctl --user status
 Follow the Linux Getting Started flow inside WSL:
 
 ```bash
-git clone https://github.com/moltbot/moltbot.git
+git clone https://github.com/lantanios/moltbot.git
 cd moltbot
 pnpm install
 pnpm ui:build # auto-installs UI deps on first run

@@ -13,11 +13,11 @@
   "topbarLinks": [
     {
       "name": "GitHub",
-      "url": "https://github.com/moltbot/moltbot"
+      "url": "https://github.com/lantanios/moltbot"
     },
     {
       "name": "Releases",
-      "url": "https://github.com/moltbot/moltbot/releases"
+      "url": "https://github.com/lantanios/moltbot/releases"
     }
   ],
   "redirects": [
@@ -833,11 +833,7 @@
       },
       {
         "group": "Help",
-        "pages": [
-          "help/index",
-          "help/troubleshooting",
-          "help/faq"
-        ]
+        "pages": ["help/index", "help/troubleshooting", "help/faq"]
       },
       {
         "group": "Install & Updates",
@@ -970,13 +966,7 @@
       },
       {
         "group": "Web & Interfaces",
-        "pages": [
-          "web",
-          "web/control-ui",
-          "web/dashboard",
-          "web/webchat",
-          "tui"
-        ]
+        "pages": ["web", "web/control-ui", "web/dashboard", "web/webchat", "tui"]
       },
       {
         "group": "Channels",
@@ -1062,15 +1052,7 @@
       },
       {
         "group": "Nodes & Media",
-        "pages": [
-          "nodes",
-          "nodes/camera",
-          "nodes/images",
-          "nodes/audio",
-          "nodes/location-command",
-          "nodes/voicewake",
-          "nodes/talk"
-        ]
+        "pages": ["nodes", "nodes/camera", "nodes/images", "nodes/audio", "nodes/location-command", "nodes/voicewake", "nodes/talk"]
       },
       {
         "group": "Platforms",

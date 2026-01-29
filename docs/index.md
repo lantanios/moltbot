@@ -3,9 +3,10 @@ summary: "Top-level overview of Moltbot, features, and purpose"
 read_when:
   - Introducing Moltbot to newcomers
 ---
+
 # Moltbot 🦞
 
-> *"EXFOLIATE! EXFOLIATE!"* — A space lobster, probably
+> _"EXFOLIATE! EXFOLIATE!"_ — A space lobster, probably
 
 <p align="center">
   <img src="whatsapp-clawd.jpg" alt="Moltbot" width="420" />
@@ -18,8 +19,8 @@ read_when:
 </p>
 
 <p align="center">
-  <a href="https://github.com/moltbot/moltbot">GitHub</a> ·
-  <a href="https://github.com/moltbot/moltbot/releases">Releases</a> ·
+  <a href="https://github.com/lantanios/moltbot">GitHub</a> ·
+  <a href="https://github.com/lantanios/moltbot/releases">Releases</a> ·
   <a href="/">Docs</a> ·
   <a href="/start/clawd">Moltbot assistant setup</a>
 </p>
@@ -120,7 +121,7 @@ Switching between npm and git installs later is easy: install the other flavor a
 From source (development):
 
 ```bash
-git clone https://github.com/moltbot/moltbot.git
+git clone https://github.com/lantanios/moltbot.git
 cd moltbot
 pnpm install
 pnpm ui:build # auto-installs UI deps on first run
@@ -158,10 +159,10 @@ Example:
   channels: {
     whatsapp: {
       allowFrom: ["+15555550123"],
-      groups: { "*": { requireMention: true } }
-    }
+      groups: { "*": { requireMention: true } },
+    },
   },
-  messages: { groupChat: { mentionPatterns: ["@clawd"] } }
+  messages: { groupChat: { mentionPatterns: ["@clawd"] } },
 }
 ```
 
@@ -169,7 +170,7 @@ Example:
 
 - Start here:
   - [Docs hubs (all pages linked)](/start/hubs)
-  - [Help](/help) ← *common fixes + troubleshooting*
+  - [Help](/help) ← _common fixes + troubleshooting_
   - [Configuration](/gateway/configuration)
   - [Configuration examples](/gateway/configuration-examples)
   - [Slash commands](/tools/slash-commands)
@@ -218,7 +219,7 @@ Example:
 
 ---
 
-*"We're all just playing with our own prompts."* — an AI, probably high on tokens
+_"We're all just playing with our own prompts."_ — an AI, probably high on tokens
 
 ## Credits
 
@@ -237,4 +238,4 @@ MIT — Free as a lobster in the ocean 🦞
 
 ---
 
-*"We're all just playing with our own prompts."* — An AI, probably high on tokens
+_"We're all just playing with our own prompts."_ — An AI, probably high on tokens

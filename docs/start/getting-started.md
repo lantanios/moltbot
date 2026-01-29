@@ -14,6 +14,7 @@ and chat in the browser, or open `http://127.0.0.1:18789/` on the gateway host.
 Docs: [Dashboard](/web/dashboard) and [Control UI](/web/control-ui).
 
 Recommended path: use the **CLI onboarding wizard** (`moltbot onboard`). It sets up:
+
 - model/auth (OAuth recommended)
 - gateway settings
 - channels (WhatsApp/Telegram/Discord/Mattermost (plugin)/...)
@@ -82,6 +83,7 @@ moltbot onboard --install-daemon
 ```
 
 What you’ll choose:
+
 - **Local vs Remote** gateway
 - **Auth**: OpenAI Code (Codex) subscription (OAuth) or API keys. For Anthropic we recommend an API key; `claude setup-token` is also supported.
 - **Providers**: WhatsApp QR login, Telegram/Discord bot tokens, Mattermost plugin tokens, etc.
@@ -143,6 +145,7 @@ WhatsApp doc: [WhatsApp](/channels/whatsapp)
 ### Telegram / Discord / others
 
 The wizard can write tokens/config for you. If you prefer manual config, start with:
+
 - Telegram: [Telegram](/channels/telegram)
 - Discord: [Discord](/channels/discord)
 - Mattermost (plugin): [Mattermost](/channels/mattermost)
@@ -166,7 +169,7 @@ Pairing doc: [Pairing](/start/pairing)
 If you’re hacking on Moltbot itself, run from source:
 
 ```bash
-git clone https://github.com/moltbot/moltbot.git
+git clone https://github.com/lantanios/moltbot.git
 cd moltbot
 pnpm install
 pnpm ui:build # auto-installs UI deps on first run

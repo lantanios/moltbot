@@ -2,12 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-import {
-  DEFAULT_AGENTS_FILENAME,
-  DEFAULT_IDENTITY_FILENAME,
-  DEFAULT_SOUL_FILENAME,
-  DEFAULT_USER_FILENAME,
-} from "../agents/workspace.js";
+import { DEFAULT_AGENTS_FILENAME, DEFAULT_IDENTITY_FILENAME, DEFAULT_SOUL_FILENAME, DEFAULT_USER_FILENAME } from "../agents/workspace.js";
 import { shortenHomePath } from "../utils.js";
 
 export const MEMORY_SYSTEM_PROMPT = [
@@ -15,8 +10,8 @@ export const MEMORY_SYSTEM_PROMPT = [
   "Paste this into your agent:",
   "",
   "Install the memory system by applying:",
-  "https://github.com/moltbot/moltbot/commit/9ffea23f31ca1df5183b25668f8f814bee0fb34e",
-  "https://github.com/moltbot/moltbot/commit/7d1fee70e76f2f634f1b41fca927ee663914183a",
+  "https://github.com/lantanios/moltbot/commit/9ffea23f31ca1df5183b25668f8f814bee0fb34e",
+  "https://github.com/lantanios/moltbot/commit/7d1fee70e76f2f634f1b41fca927ee663914183a",
 ].join("\n");
 
 export async function shouldSuggestMemorySystem(workspaceDir: string): Promise<boolean> {
@@ -48,12 +43,7 @@ export type LegacyWorkspaceDetection = {
 };
 
 function looksLikeWorkspaceDir(dir: string, exists: (value: string) => boolean) {
-  const markers = [
-    DEFAULT_AGENTS_FILENAME,
-    DEFAULT_SOUL_FILENAME,
-    DEFAULT_USER_FILENAME,
-    DEFAULT_IDENTITY_FILENAME,
-  ];
+  const markers = [DEFAULT_AGENTS_FILENAME, DEFAULT_SOUL_FILENAME, DEFAULT_USER_FILENAME, DEFAULT_IDENTITY_FILENAME];
   return markers.some((name) => exists(path.join(dir, name)));
 }
 

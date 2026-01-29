@@ -51,11 +51,7 @@ function dataUrlToBase64(dataUrl: string): { content: string; mimeType: string }
   return { mimeType: match[1], content: match[2] };
 }
 
-export async function sendChatMessage(
-  state: ChatState,
-  message: string,
-  attachments?: ChatAttachment[],
-): Promise<boolean> {
+export async function sendChatMessage(state: ChatState, message: string, attachments?: ChatAttachment[]): Promise<boolean> {
   if (!state.client || !state.connected) return false;
   const msg = message.trim();
   const hasAttachments = attachments && attachments.length > 0;
@@ -142,12 +138,7 @@ export async function abortChatRun(state: ChatState): Promise<boolean> {
   if (!state.client || !state.connected) return false;
   const runId = state.chatRunId;
   try {
-    await state.client.request(
-      "chat.abort",
-      runId
-        ? { sessionKey: state.sessionKey, runId }
-        : { sessionKey: state.sessionKey },
-    );
+    await state.client.request("chat.abort", runId ? { sessionKey: state.sessionKey, runId } : { sessionKey: state.sessionKey });
     return true;
   } catch (err) {
     state.lastError = String(err);
@@ -155,20 +146,13 @@ export async function abortChatRun(state: ChatState): Promise<boolean> {
   }
 }
 
-export function handleChatEvent(
-  state: ChatState,
-  payload?: ChatEventPayload,
-) {
+export function handleChatEvent(state: ChatState, payload?: ChatEventPayload) {
   if (!payload) return null;
   if (payload.sessionKey !== state.sessionKey) return null;
 
   // Final from another run (e.g. sub-agent announce): refresh history to show new message.
-  // See https://github.com/moltbot/moltbot/issues/1909
-  if (
-    payload.runId &&
-    state.chatRunId &&
-    payload.runId !== state.chatRunId
-  ) {
+  // See https://github.com/lantanios/moltbot/issues/1909
+  if (payload.runId && state.chatRunId && payload.runId !== state.chatRunId) {
     if (payload.state === "final") return "final";
     return null;
   }

@@ -8,7 +8,7 @@ read_when:
 
 # Ansible Installation
 
-The recommended way to deploy Moltbot to production servers is via **[moltbot-ansible](https://github.com/moltbot/moltbot-ansible)** — an automated installer with security-first architecture.
+The recommended way to deploy Moltbot to production servers is via **[moltbot-ansible](https://github.com/lantanios/moltbot-ansible)** — an automated installer with security-first architecture.
 
 ## Quick Start
 
@@ -18,7 +18,7 @@ One-command install:
 curl -fsSL https://raw.githubusercontent.com/moltbot/moltbot-ansible/main/install.sh | bash
 ```
 
-> **📦 Full guide: [github.com/moltbot/moltbot-ansible](https://github.com/moltbot/moltbot-ansible)**
+> **📦 Full guide: [github.com/lantanios/moltbot-ansible](https://github.com/lantanios/moltbot-ansible)**
 >
 > The moltbot-ansible repo is the source of truth for Ansible deployment. This page is a quick overview.
 
@@ -117,7 +117,7 @@ If you prefer manual control over the automation:
 sudo apt update && sudo apt install -y ansible git
 
 # 2. Clone repository
-git clone https://github.com/moltbot/moltbot-ansible.git
+git clone https://github.com/lantanios/moltbot-ansible.git
 cd moltbot-ansible
 
 # 3. Install Ansible collections
@@ -148,6 +148,7 @@ Note: This is idempotent and safe to run multiple times.
 ### Firewall blocks my connection
 
 If you're locked out:
+
 - Ensure you can access via Tailscale VPN first
 - SSH access (port 22) is always allowed
 - The gateway is **only** accessible via Tailscale by design
@@ -193,13 +194,14 @@ moltbot channels login
 ## Advanced Configuration
 
 For detailed security architecture and troubleshooting:
-- [Security Architecture](https://github.com/moltbot/moltbot-ansible/blob/main/docs/security.md)
-- [Technical Details](https://github.com/moltbot/moltbot-ansible/blob/main/docs/architecture.md)
-- [Troubleshooting Guide](https://github.com/moltbot/moltbot-ansible/blob/main/docs/troubleshooting.md)
+
+- [Security Architecture](https://github.com/lantanios/moltbot-ansible/blob/main/docs/security.md)
+- [Technical Details](https://github.com/lantanios/moltbot-ansible/blob/main/docs/architecture.md)
+- [Troubleshooting Guide](https://github.com/lantanios/moltbot-ansible/blob/main/docs/troubleshooting.md)
 
 ## Related
 
-- [moltbot-ansible](https://github.com/moltbot/moltbot-ansible) — full deployment guide
+- [moltbot-ansible](https://github.com/lantanios/moltbot-ansible) — full deployment guide
 - [Docker](/install/docker) — containerized gateway setup
 - [Sandboxing](/gateway/sandboxing) — agent sandbox configuration
 - [Multi-Agent Sandbox & Tools](/multi-agent-sandbox-tools) — per-agent isolation
