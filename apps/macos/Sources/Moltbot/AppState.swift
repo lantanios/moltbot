@@ -450,89 +450,19 @@ final class AppState {
             : nil
 
         Task { @MainActor in
-            // Keep app-only connection settings local to avoid overwriting remote gateway config.
             var root = MoltbotConfigFile.loadDict()
             var gateway = root["gateway"] as? [String: Any] ?? [:]
-            var changed = false
-
-            let currentMode = (gateway["mode"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines)
-            if let desiredMode {
-                if currentMode != desiredMode {
-                    gateway["mode"] = desiredMode
-                    changed = true
-                }
-            } else if currentMode != nil {
-                gateway.removeValue(forKey: "mode")
-                changed = true
-            }
+            var changed = Self.syncGatewayMode(gateway: &gateway, desiredMode: desiredMode)
 
             if connectionMode == .remote {
-                var remote = gateway["remote"] as? [String: Any] ?? [:]
-                var remoteChanged = false
-
-                if remoteTransport == .direct {
-                    let trimmedUrl = remoteUrl.trimmingCharacters(in: .whitespacesAndNewlines)
-                    if trimmedUrl.isEmpty {
-                        if remote["url"] != nil {
-                            remote.removeValue(forKey: "url")
-                            remoteChanged = true
-                        }
-                    } else {
-                        let normalizedUrl = GatewayRemoteConfig.normalizeGatewayUrlString(trimmedUrl) ?? trimmedUrl
-                        if (remote["url"] as? String) != normalizedUrl {
-                            remote["url"] = normalizedUrl
-                            remoteChanged = true
-                        }
-                    }
-                    if (remote["transport"] as? String) != RemoteTransport.direct.rawValue {
-                        remote["transport"] = RemoteTransport.direct.rawValue
-                        remoteChanged = true
-                    }
-                } else {
-                    if remote["transport"] != nil {
-                        remote.removeValue(forKey: "transport")
-                        remoteChanged = true
-                    }
-                    if let host = remoteHost {
-                        let existingUrl = (remote["url"] as? String)?
-                            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-                        let parsedExisting = existingUrl.isEmpty ? nil : URL(string: existingUrl)
-                        let scheme = parsedExisting?.scheme?.isEmpty == false ? parsedExisting?.scheme : "ws"
-                        let port = parsedExisting?.port ?? 18789
-                        let desiredUrl = "\(scheme ?? "ws")://\(host):\(port)"
-                        if existingUrl != desiredUrl {
-                            remote["url"] = desiredUrl
-                            remoteChanged = true
-                        }
-                    }
-
-                    let sanitizedTarget = Self.sanitizeSSHTarget(remoteTarget)
-                    if !sanitizedTarget.isEmpty {
-                        if (remote["sshTarget"] as? String) != sanitizedTarget {
-                            remote["sshTarget"] = sanitizedTarget
-                            remoteChanged = true
-                        }
-                    } else if remote["sshTarget"] != nil {
-                        remote.removeValue(forKey: "sshTarget")
-                        remoteChanged = true
-                    }
-
-                    let trimmedIdentity = remoteIdentity.trimmingCharacters(in: .whitespacesAndNewlines)
-                    if !trimmedIdentity.isEmpty {
-                        if (remote["sshIdentity"] as? String) != trimmedIdentity {
-                            remote["sshIdentity"] = trimmedIdentity
-                            remoteChanged = true
-                        }
-                    } else if remote["sshIdentity"] != nil {
-                        remote.removeValue(forKey: "sshIdentity")
-                        remoteChanged = true
-                    }
-                }
-
-                if remoteChanged {
-                    gateway["remote"] = remote
-                    changed = true
-                }
+                let remoteChanged = Self.syncRemoteConfig(
+                    gateway: &gateway,
+                    remoteTransport: remoteTransport,
+                    remoteUrl: remoteUrl,
+                    remoteHost: remoteHost,
+                    remoteTarget: remoteTarget,
+                    remoteIdentity: remoteIdentity)
+                changed = changed || remoteChanged
             }
 
             guard changed else { return }
@@ -543,6 +473,118 @@ final class AppState {
             }
             MoltbotConfigFile.saveDict(root)
         }
+    }
+
+    private static func syncGatewayMode(gateway: inout [String: Any], desiredMode: String?) -> Bool {
+        var changed = false
+        let currentMode = (gateway["mode"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let desiredMode {
+            if currentMode != desiredMode {
+                gateway["mode"] = desiredMode
+                changed = true
+            }
+        } else if currentMode != nil {
+            gateway.removeValue(forKey: "mode")
+            changed = true
+        }
+        return changed
+    }
+
+    private static func syncRemoteConfig(
+        gateway: inout [String: Any],
+        remoteTransport: RemoteTransport,
+        remoteUrl: String,
+        remoteHost: String?,
+        remoteTarget: String,
+        remoteIdentity: String
+    ) -> Bool {
+        var remote = gateway["remote"] as? [String: Any] ?? [:]
+        var remoteChanged = false
+
+        if remoteTransport == .direct {
+            remoteChanged = syncDirectTransport(remote: &remote, remoteUrl: remoteUrl)
+        } else {
+            remoteChanged = syncSSHTransport(
+                remote: &remote,
+                remoteHost: remoteHost,
+                remoteTarget: remoteTarget,
+                remoteIdentity: remoteIdentity)
+        }
+
+        if remoteChanged {
+            gateway["remote"] = remote
+        }
+        return remoteChanged
+    }
+
+    private static func syncDirectTransport(remote: inout [String: Any], remoteUrl: String) -> Bool {
+        var changed = false
+        let trimmedUrl = remoteUrl.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmedUrl.isEmpty {
+            if remote["url"] != nil {
+                remote.removeValue(forKey: "url")
+                changed = true
+            }
+        } else {
+            let normalizedUrl = GatewayRemoteConfig.normalizeGatewayUrlString(trimmedUrl) ?? trimmedUrl
+            if (remote["url"] as? String) != normalizedUrl {
+                remote["url"] = normalizedUrl
+                changed = true
+            }
+        }
+        if (remote["transport"] as? String) != RemoteTransport.direct.rawValue {
+            remote["transport"] = RemoteTransport.direct.rawValue
+            changed = true
+        }
+        return changed
+    }
+
+    private static func syncSSHTransport(
+        remote: inout [String: Any],
+        remoteHost: String?,
+        remoteTarget: String,
+        remoteIdentity: String
+    ) -> Bool {
+        var changed = false
+        if remote["transport"] != nil {
+            remote.removeValue(forKey: "transport")
+            changed = true
+        }
+        if let host = remoteHost {
+            let existingUrl = (remote["url"] as? String)?
+                .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            let parsedExisting = existingUrl.isEmpty ? nil : URL(string: existingUrl)
+            let scheme = parsedExisting?.scheme?.isEmpty == false ? parsedExisting?.scheme : "ws"
+            let port = parsedExisting?.port ?? 18789
+            let desiredUrl = "\(scheme ?? "ws")://\(host):\(port)"
+            if existingUrl != desiredUrl {
+                remote["url"] = desiredUrl
+                changed = true
+            }
+        }
+
+        let sanitizedTarget = sanitizeSSHTarget(remoteTarget)
+        if !sanitizedTarget.isEmpty {
+            if (remote["sshTarget"] as? String) != sanitizedTarget {
+                remote["sshTarget"] = sanitizedTarget
+                changed = true
+            }
+        } else if remote["sshTarget"] != nil {
+            remote.removeValue(forKey: "sshTarget")
+            changed = true
+        }
+
+        let trimmedIdentity = remoteIdentity.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmedIdentity.isEmpty {
+            if (remote["sshIdentity"] as? String) != trimmedIdentity {
+                remote["sshIdentity"] = trimmedIdentity
+                changed = true
+            }
+        } else if remote["sshIdentity"] != nil {
+            remote.removeValue(forKey: "sshIdentity")
+            changed = true
+        }
+        return changed
     }
 
     func triggerVoiceEars(ttl: TimeInterval? = 5) {
